@@ -1,0 +1,101 @@
+import random
+
+def battle_monster(player):
+    monsters = ["Monkey", "shark", "cockroach"]
+    monster = random.choice(monsters)
+    monster_life = random.randint(20, 40)
+    print(f"{monster} appears with {monster_life} life.")
+
+    while monster_life > 0 and player["life"] > 0:
+        action = input("[attack] or [run]: ").lower()
+
+        if action == "attack":
+            damage = random.randint(5, 15)
+            if "amulet" in player["powerups"]:
+                damage += 5
+                player["powerups"].remove("amulet")
+            monster_life -= damage
+            print(f"You hit {monster} for {damage}. Monster life: {monster_life}")
+
+            if monster_life > 0:
+                monster_hit = random.randint(5, 12)
+                if "shield" in player["powerups"]:
+                    monster_hit //= 2
+                    player["powerups"].remove("shield")
+                player["life"] -= monster_hit
+                print(f"{monster} hits you for {monster_hit}. Your life: {player['life']}")
+
+        elif action == "run":
+            print(f"You escaped from {monster}.")
+            return
+
+    if player["life"] <= 0:
+        print("Game Over.")
+        exit()
+    else:
+        reward = random.randint(10, 30)
+        player["coins"] += reward
+        print(f"You defeated {monster}. You got {reward} coins.")
+
+
+def open_chest(player):
+    items = ["potion", "shield", "amulet"]
+    reward = random.choice(items)
+    player["bag"].append(reward)
+    print(f"You found a {reward}.")
+
+
+def use_item(player):
+    if not player["bag"]:
+        print("Bag is empty.")
+        return
+
+    print("Bag:", player["bag"])
+    choice = input("Use what? ").lower()
+
+    if choice in player["bag"]:
+        if choice == "potion":
+            player["life"] += 20
+            print("+20 life.")
+        elif choice == "shield":
+            player["powerups"].append("shield")
+            print("Shield ready.")
+        elif choice == "amulet":
+            player["powerups"].append("amulet")
+            print("Amulet ready.")
+        player["bag"].remove(choice)
+    else:
+        print("Not in bag.")
+
+
+print("Welcome to the Dungeon")
+
+player = {
+    "name": input("Enter your name: "),
+    "life": 100,
+    "coins": 50,
+    "bag": ["sword"],
+    "powerups": []
+}
+
+while player["life"] > 0:
+    event = random.choice(["monster", "chest", "nothing"])
+
+    if event == "monster":
+        battle_monster(player)
+    elif event == "chest":
+        open_chest(player)
+    else:
+        print("Empty room.")
+
+    print(f"Life: {player['life']} | Coins: {player['coins']} | Bag: {player['bag']}")
+    choice = input("[continue], [use item], or [quit]: ").lower()
+
+    if choice == "use item":
+        use_item(player)
+    elif choice == "quit":
+        print(f"You leave with {player['coins']} coins.")
+        break
+
+print("Game over.")
+
